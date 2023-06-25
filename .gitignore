@@ -1,0 +1,10 @@
+node_modules
+temp
+build
+merkle-ton/node_modules
+merkle-ton/temp
+merkle-ton/build
+ton-bls-verify/node_modules
+ton-bls-verify/temp
+ton-bls-verify/build
+

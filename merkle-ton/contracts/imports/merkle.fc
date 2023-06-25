@@ -1,0 +1,32 @@
+const int proof_len = 30;
+
+int keccak256_1(slice s, int n) asm "HASHEXT_KECCAK256";
+
+int keccakHash(int a) {
+    cell c = begin_cell()
+        .store_uint(a, 256)
+        .end_cell();
+    slice s = c.begin_parse();
+    return keccak256_1(s, 1);
+}
+
+int pairHash(int a, int b) {
+    int hA = keccakHash(a);
+    int hB = keccakHash(b);
+    int c = hA ^ hB;
+    return keccakHash(c);
+}
+
+int check_merkle_proof(int value, cell proof, int expected_merkle_root) {
+    cell nxt = proof;
+    repeat(proof_len - 1) {
+        slice s = nxt.begin_parse();
+        int next_v = s~load_uint(256);
+        value = pairHash(value, next_v);
+        nxt = s~load_ref();
+    }
+    slice s = nxt.begin_parse();
+    int next_v = s~load_uint(256);
+    value = pairHash(value, next_v);
+    return expected_merkle_root == value;
+}
